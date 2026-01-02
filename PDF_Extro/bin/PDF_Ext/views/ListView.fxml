@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<VBox 
+    maxWidth="400" maxHeight="400" 
+    minWidth="50" minHeight="100" 
+    alignment="TOP_CENTER"
+    xmlns:fx="http://javafx.com/fxml"
+    fx:controller="PDF_Ext.controllers.ListViewSrcDir_Controller"
+    stylesheets="@../css/index.css">
+    <Label fx:id="selectionCountLabel">
+        <VBox.margin>
+            <Insets top="20"/>
+        </VBox.margin>
+    </Label>
+    <ListView 
+        fx:id="listViewSrcDir" 
+        styleClass="ListView">
+        <VBox.margin>
+            <Insets top="20.0" right="20.0" bottom="20.0" left="20.0" />
+        </VBox.margin>
+    </ListView>
+    <HBox alignment="CENTER" spacing="20">
+        <Button fx:id="buttonCheckAll" onAction="#handleCheckAll" text="Check All"/>
+        <Button fx:id="buttonUncheckAll" onAction="#handleUncheckAll" text="Uncheck All"/>
+    </HBox>
+</VBox>

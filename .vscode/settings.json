@@ -1,0 +1,23 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/javafx-swt.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/javafx.base.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/javafx.controls.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/javafx.fxml.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/javafx.graphics.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/javafx.media.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/javafx.swing.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/javafx.web.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/jdk.jsobject.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/jfx.incubator.input.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/jfx.incubator.richtext.jar",
+        "/Library/Java Packages/PDFBox-3.0.6/fontbox-3.0.6.jar",
+        "/Library/Java Packages/PDFBox-3.0.6/pdfbox-app-3.0.6.jar",
+        "/Library/Java Packages/PDFBox-3.0.6/pdfbox-debugger-3.0.6.jar",
+        "/Library/Java Packages/PDFBox-3.0.6/pdfbox-io-3.0.6.jar",
+        "/Library/Java Packages/PDFBox-3.0.6/pdfbox-tools-3.0.6.jar",
+        "/Library/Java Packages/PDFBox-3.0.6/preflight-3.0.6.jar",
+        "/Library/Java Packages/PDFBox-3.0.6/xmpbox-3.0.6.jar"
+    ]
+}

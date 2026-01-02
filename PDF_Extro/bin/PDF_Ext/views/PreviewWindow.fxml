@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+
+<!-- <VBox 
+    maxWidth="400" maxHeight="400" 
+    minWidth="50" minHeight="100" 
+    alignment="TOP_CENTER"
+    xmlns:fx="http://javafx.com/fxml"
+    fx:controller="PDF_Ext.controllers.PreviewWindow_Controller"
+    stylesheets="@../css/index.css">
+    
+    <Label fx:id="TitleText" text="Please select a file!"/>
+    
+    <ScrollPane fx:id="scrollableArea" fitToWidth="true" pannable="true" VBox.vgrow="ALWAYS">
+        <VBox alignment="CENTER" style="-fx-background-color: grey;"> 
+            <ImageView fx:id="pdfImageView" 
+                       preserveRatio="true" 
+                       pickOnBounds="true">
+                <VBox.margin>
+                    <Insets top="10" bottom="10" left="10" right="10"/>
+                </VBox.margin>
+            </ImageView>
+        </VBox>
+    </ScrollPane>
+</VBox> -->
+<VBox alignment="TOP_CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="PDF_Ext.controllers.PreviewWindow_Controller">
+    <Label fx:id="TitleText" text="Please select a file!"/>
+    <HBox spacing="10" alignment="CENTER" style="-fx-padding: 10; -fx-background-color: #eee;">
+        <Button text="Previous" onAction="#handlePreviousPage"/>
+        <Label fx:id="pageLabel" text="Page: 1 / 1"/>
+        <Button text="Next" onAction="#handleNextPage"/>
+        
+        <Separator orientation="VERTICAL"/>
+        
+        <Label text="Zoom:"/>
+        <Slider fx:id="zoomSlider" min="50" max="300" value="150" showTickMarks="true"/>
+        <Label fx:id="zoomLabel" text="150 DPI"/>
+        <Button text="Fit to Width" onAction="#handleFitToWidth"/>
+    </HBox>
+
+    <ScrollPane fx:id="scrollableArea" fitToWidth="true" VBox.vgrow="ALWAYS">
+        <VBox alignment="CENTER" style="-fx-background-color: grey;">
+            <ImageView fx:id="pdfImageView" preserveRatio="true" />
+        </VBox>
+    </ScrollPane>
+</VBox>

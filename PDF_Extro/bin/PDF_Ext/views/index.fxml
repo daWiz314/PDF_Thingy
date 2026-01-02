@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="PDF_Ext.controllers.Index_Controller">
+    
+    <BorderPane fx:id="MainLayoutBP"
+        AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+        AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+        stylesheets="@../css/index.css">
+        <top>
+            <fx:include fx:id="MENU_BAR" source="MenuBar.fxml" />
+        </top>
+        <center>
+            <HBox>
+                <VBox>
+                    <fx:include fx:id="LIST_VIEW" source="ListView.fxml" />
+                </VBox>
+                <VBox  maxWidth="300" alignment="TOP_CENTER">
+                    <Label text="Enter Search Term...">
+                        <VBox.margin>
+                            <Insets top="20.0" right="20.0" bottom="20.0" left="20.0" />
+                        </VBox.margin>
+                    </Label>
+                    <TextField fx:id="searchTerm" promptText="Search..." />
+                    <HBox alignment="TOP_CENTER">
+                        <Button fx:id="searchSubmit" text="Search!" onAction="#submitSearch">
+                            <VBox.margin>
+                                <Insets top="20.0" right="20.0" bottom="20.0" left="20.0" />
+                            </VBox.margin>
+                        </Button>
+                        <Button fx:id="searchStop" text="Stop Search" onAction="#handleStop">
+                            <VBox.margin>
+                                <Insets top="20.0" right="20.0" bottom="20.0" left="20.0" />
+                            </VBox.margin>
+                        </Button>
+                    </HBox>
+                    <VBox spacing="10" alignment="CENTER">
+                        <ProgressBar fx:id="myProgressBar" prefWidth="300.0" progress="0.0" />
+                        <Label fx:id="statusLabel" text="Ready to scan..." />
+                        <ProgressBar fx:id="overallProgress" prefWidth="300.0" progress="0.0" />
+                        <Label fx:id="overallStatusLabel" text="" />
+                    </VBox>
+                </VBox>
+                <VBox>
+                    <fx:include fx:id="RESULTS" source="Results.fxml" />
+                </VBox>
+            </HBox>
+        </center>
+    </BorderPane>
+</AnchorPane>

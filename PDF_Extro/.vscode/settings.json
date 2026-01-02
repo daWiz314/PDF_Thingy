@@ -1,0 +1,8 @@
+{
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/Library/Java Packages/javafx-sdk-25.0.1/lib/**/*.jar",
+        "/Library/Java Packages/PDFBox-3.0.6/**/*.jar"
+    ]
+}
