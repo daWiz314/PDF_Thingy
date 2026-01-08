@@ -3,6 +3,7 @@ package PDF_Ext.controllers;
 import PDF_Ext.classes.FileCheckBoxCell;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.function.Consumer;
 
@@ -19,7 +20,6 @@ import javafx.scene.input.MouseEvent;
 
 public class ListViewSrcDir_Controller {
     @FXML private ListView<File> listViewSrcDir;
-    private File srcDir;
     ObservableList<File> srcDirContents = FXCollections.observableArrayList();
 
     private final ObservableSet<File> checkedFiles = FXCollections.observableSet(new HashSet<>());
@@ -86,7 +86,6 @@ public class ListViewSrcDir_Controller {
     public void updateSrcDir(File dir) {
         srcDirContents.clear(); // Clean slate for displaying the data
         checkedFiles.clear();   // Clean slate if the user has done multiple actions
-        srcDir = dir;           // Update to contain for later
         listViewSrcDir.setItems(srcDirContents);
 
         for (File item : dir.listFiles()) {
@@ -95,6 +94,8 @@ public class ListViewSrcDir_Controller {
             }
             continue;
         }
+
+        srcDirContents.sort(Comparator.comparing(File::getName, String.CASE_INSENSITIVE_ORDER));
         listViewSrcDir.setItems(srcDirContents);
     }
 
