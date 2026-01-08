@@ -47,12 +47,15 @@ public class Index_Controller {
         // Set up call back function for menubar selectSrcDir
         MENU_BARController.set_call_back_function_src_dir((dir) -> LIST_VIEWController.updateSrcDir(dir));
         MENU_BARController.openPreviewWindow = () -> {openPreviewWindow();};
+        // Grab submitSearch button for enabling/disabling during search
         LIST_VIEWController.startSearchButton = searchSubmit;
         searchSubmit.setDisable(true);
         searchStop.setDisable(true);
 
+        // Set up call back function for matches
         PDF_Tool.Main.call_back_function_for_matches = (result) -> { RESULTSController.updateResults(result);};
 
+        // Set up call back function to open preview window
         RESULTSController.PreviewWindowCallBack = (result) -> {
             openPreviewWindow();
         };
@@ -83,9 +86,9 @@ public class Index_Controller {
                 activePreviewController.setHighlightTerm(searchTerm.getText());
                 activePreviewController.setPdfFile(result.getFile(), result.getPageNumber());
             };
-            return;
         }
-       java.net.URL fxmlLocation = getClass().getResource("/PDF_Ext/views/PreviewWindow.fxml");
+
+        java.net.URL fxmlLocation = getClass().getResource("/PDF_Ext/views/PreviewWindow.fxml");
     
         if (fxmlLocation == null) {
             System.err.println("ERROR: Could not find PreviewWindow.fxml! Check your file path.");
