@@ -1,9 +1,9 @@
 package PDF_Ext.controllers;
 import PDF_Ext.classes.SearchResult;
 import PDF_Ext.classes.SearchResultsCheckBoxCell;
-import PDF_Ext.classes.PdfPageExtractor;
+import PDF_Ext.classes.PDFPageExtractor;
 
-
+import java.io.File;
 import java.util.HashSet;
 import java.util.function.Consumer;
 
@@ -16,7 +16,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.stage.FileChooser;
+import javafx.stage.DirectoryChooser;
 
 public class Results_Controller {
     @FXML private Label resultCountLabel;       // "Selected 0 / 0 Matches"
@@ -74,9 +74,26 @@ private void safeNotifyPreview(SearchResult result) {
 
 
     @FXML private void handleExport() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Results");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        if (checkedResults.size() > 1) {
+
+        } else if (checkedResults.size() == 1) {
+            DirectoryChooser DC = new DirectoryChooser();
+        DC.setTitle("Save Results");
+
+        File saveDir = DC.showDialog(resultCountLabel.getScene().getWindow());
+
+        System.out.println(saveDir.getAbsolutePath());
+
+         
+
+        // PDFPageExtractor.extractPage(checkedResults, saveDir.getName(), saveDir.getAbsolutePath(), results.get(results.indexOf(checkedResults)));
+
+        } else {
+            return;
+        }
+        
+
+        
     
     // File saveFile = fileChooser.showSaveDialog(pdfImageView.getScene().getWindow());
     
@@ -105,14 +122,5 @@ private void safeNotifyPreview(SearchResult result) {
         results.add(result);
         listViewResults.setItems(results);
     }
-
-    // private void saveDataToFile(File file) {
-    //     try (java.io.PrintWriter writer = new java.io.PrintWriter(file)) {
-    //         writer.println("File Name, Page, Content");
-    //         writer.println(currentFile.getName() + "," + (currentPage + 1) + ", Confirmed Data");
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
     
 }
