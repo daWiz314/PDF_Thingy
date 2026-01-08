@@ -50,6 +50,7 @@ public class PreviewWindow_Controller {
             }
         });
 
+        // TODO: Fix this, by disabling focus on buttons on page
         javafx.application.Platform.runLater(() -> {
             if (pdfImageView.getScene() != null) {
                 pdfImageView.getScene().setOnKeyPressed(event -> {
