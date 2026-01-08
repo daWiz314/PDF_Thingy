@@ -7,7 +7,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import java.io.File;
 import java.io.IOException;
 
-public class PdfPageExtractor {
+public class PDFPageExtractor {
 
     /**
      * Extracts a specific page from a source PDF and saves it to a destination.
