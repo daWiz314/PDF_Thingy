@@ -29,9 +29,6 @@ public class ListViewSrcDir_Controller {
 
     private final ObservableSet<File> checkedFiles = FXCollections.observableSet(new HashSet<>()); // This is what we want to get rid of
 
-
-    
-
     public Consumer<File> PreviewWindowCallBack;
 
     public void initialize() {
