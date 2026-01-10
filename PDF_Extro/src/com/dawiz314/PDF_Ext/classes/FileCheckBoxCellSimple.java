@@ -9,17 +9,17 @@ import javafx.scene.control.ListCell;
  * Simple ListCell that shows a CheckBox and stores selection in a plain Set<File>.
  * Calls a Runnable callback when the selection changes so controllers can react.
  */
-public class FileCheckBoxCellSimple extends ListCell<File> {
+public class FileCheckBoxCellSimple extends ListCell<ListFile> {
     private final CheckBox checkBox = new CheckBox();
-    private final Set<File> checkedFiles;
+    private final Set<ListFile> checkedFiles;
     private final Runnable onChange;
 
-    public FileCheckBoxCellSimple(Set<File> checkedFiles, Runnable onChange) {
+    public FileCheckBoxCellSimple(Set<ListFile> checkedFiles, Runnable onChange) {
         this.checkedFiles = checkedFiles;
         this.onChange = onChange;
 
         checkBox.setOnAction(e -> {
-            File item = getItem();
+            ListFile item = getItem();
             if (item != null) {
                 if (checkBox.isSelected()) checkedFiles.add(item);
                 else checkedFiles.remove(item);
@@ -28,15 +28,15 @@ public class FileCheckBoxCellSimple extends ListCell<File> {
         });
     }
 
-    @Override protected void updateItem(File file, boolean empty) {
-        super.updateItem(file, empty);
-        if (empty || file == null) {
+    @Override protected void updateItem(ListFile listFile, boolean empty) {
+        super.updateItem(listFile, empty);
+        if (empty || listFile == null) {
             setGraphic(null);
             setText(null);
         } else {
-            checkBox.setSelected(checkedFiles.contains(file));
+            checkBox.setSelected(checkedFiles.contains(listFile));
             setGraphic(checkBox);
-            setText(file.getName());
+            setText(listFile.getFile().getName());
         }
     }
 }
