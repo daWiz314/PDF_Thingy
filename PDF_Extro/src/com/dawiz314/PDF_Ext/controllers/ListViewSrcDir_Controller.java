@@ -19,15 +19,23 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 
 public class ListViewSrcDir_Controller {
-    @FXML private ListView<File> listViewSrcDir;
-    ObservableList<File> srcDirContents = FXCollections.observableArrayList();
+    // Actual UI Components -------------------------------------------------------------------
+    @FXML private ListView<File> listViewSrcDir; // ListView to show files in source directory
+    @FXML private Label selectionCountLabel; // Label to show count of selected files
 
-    private final ObservableSet<File> checkedFiles = FXCollections.observableSet(new HashSet<>());
-    @FXML private Label selectionCountLabel;
-    public Button startSearchButton;
+    public Button searchSubmit; // Button to start search - passed from Index_Controller
+    // Variables -------------------------------------------------------------------------------
+    ObservableList<File> srcDirContents = FXCollections.observableArrayList(); // Contains the items that actually go in the ListView
+
+    private final ObservableSet<File> checkedFiles = FXCollections.observableSet(new HashSet<>()); // This is what we want to get rid of
+
+
+    
+
     public Consumer<File> PreviewWindowCallBack;
 
     public void initialize() {
+
         listViewSrcDir.setItems(srcDirContents);
 
         listViewSrcDir.setOnMouseMoved(event -> {
@@ -56,22 +64,22 @@ public class ListViewSrcDir_Controller {
             }
         });
 
-        checkedFiles.addListener((SetChangeListener<File>) change -> {
-            PDF_Tool.Main.updateSelectedFile(checkedFiles);
-        });
+        // checkedFiles.addListener((SetChangeListener<File>) change -> {
+        //     PDF_Tool.Main.updateSelectedFile(checkedFiles);
+        // });
 
-        listViewSrcDir.setCellFactory(lv -> new FileCheckBoxCell(checkedFiles));
+        // listViewSrcDir.setCellFactory(lv -> new FileCheckBoxCell(checkedFiles));
 
         selectionCountLabel.setText("Select a directory to get started!");
 
-        checkedFiles.addListener((SetChangeListener<File>) change -> {
-            int count = checkedFiles.size();
-            int total = srcDirContents.size();
+        // checkedFiles.addListener((SetChangeListener<File>) change -> {
+        //     int count = checkedFiles.size();
+        //     int total = srcDirContents.size();
             
-            selectionCountLabel.setText(String.format("Selected: %d / %d files", count, total));
+        //     selectionCountLabel.setText(String.format("Selected: %d / %d files", count, total));
             
-            startSearchButton.setDisable(count == 0);
-        });
+        //     searchSubmit.setDisable(count == 0);
+        // });
     }
 
     public static String getFileExtension(String filename) {
