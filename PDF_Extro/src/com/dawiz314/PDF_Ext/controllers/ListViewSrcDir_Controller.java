@@ -5,11 +5,10 @@ import PDF_Ext.classes.FileCheckBoxCell;
 import java.io.File;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -27,7 +26,7 @@ public class ListViewSrcDir_Controller {
     // Variables -------------------------------------------------------------------------------
     ObservableList<File> srcDirContents = FXCollections.observableArrayList(); // Contains the items that actually go in the ListView
 
-    private final ObservableSet<File> checkedFiles = FXCollections.observableSet(new HashSet<>()); // This is what we want to get rid of
+    private final Set<File> checkedFiles = new HashSet<>(); // Plain set to track checked files
 
     public Consumer<File> PreviewWindowCallBack;
 
@@ -61,22 +60,19 @@ public class ListViewSrcDir_Controller {
             }
         });
 
-        // checkedFiles.addListener((SetChangeListener<File>) change -> {
-        //     PDF_Tool.Main.updateSelectedFile(checkedFiles);
-        // });
-
-        // listViewSrcDir.setCellFactory(lv -> new FileCheckBoxCell(checkedFiles));
+        // Use the simple (non-observable) cell and notify on changes
+        listViewSrcDir.setCellFactory(lv -> new PDF_Ext.classes.FileCheckBoxCellSimple(checkedFiles, this::onCheckedFilesChanged));
 
         selectionCountLabel.setText("Select a directory to get started!");
+    }
 
-        // checkedFiles.addListener((SetChangeListener<File>) change -> {
-        //     int count = checkedFiles.size();
-        //     int total = srcDirContents.size();
-            
-        //     selectionCountLabel.setText(String.format("Selected: %d / %d files", count, total));
-            
-        //     searchSubmit.setDisable(count == 0);
-        // });
+    // Called by cells when their check state changes
+    private void onCheckedFilesChanged() {
+        int count = checkedFiles.size();
+        int total = srcDirContents.size();
+        selectionCountLabel.setText(String.format("Selected: %d / %d files", count, total));
+        if (searchSubmit != null) searchSubmit.setDisable(count == 0);
+        PDF_Tool.Main.updateSelectedFile(checkedFiles);
     }
 
     public static String getFileExtension(String filename) {
@@ -88,30 +84,60 @@ public class ListViewSrcDir_Controller {
         return "";
     }
 
+    /**
+     * Update the source directory listing
+     * <p>
+     * This will refresh the ListView to show all PDF files in the given directory
+     * @param dir - The new source directory
+     */
     public void updateSrcDir(File dir) {
-        srcDirContents.clear(); // Clean slate for displaying the data
-        checkedFiles.clear();   // Clean slate if the user has done multiple actions
-        listViewSrcDir.setItems(srcDirContents);
+        srcDirContents.clear();             // Clean slate for displaying the data
+        listViewSrcDir.getItems().clear();  // Clear existing items in the ListView
 
+         // Get just PDFs
         for (File item : dir.listFiles()) {
             if ("pdf".equalsIgnoreCase(getFileExtension(item.getName()))) {
                 srcDirContents.add(item);
             }
             continue;
         }
+        // Clear any prior checks when a new directory is selected
+        checkedFiles.clear();
 
+        // Sort the results by filename (case-insensitive)
         srcDirContents.sort(Comparator.comparing(File::getName, String.CASE_INSENSITIVE_ORDER));
+
         listViewSrcDir.setItems(srcDirContents);
+        listViewSrcDir.refresh();
+        onCheckedFilesChanged();
     }
+
+    // public void updateSrcDir(File dir) {
+    //     srcDirContents.clear(); // Clean slate for displaying the data
+    //     checkedFiles.clear();   // Clean slate if the user has done multiple actions
+    //     listViewSrcDir.setItems(srcDirContents);
+
+    //     for (File item : dir.listFiles()) {
+    //         if ("pdf".equalsIgnoreCase(getFileExtension(item.getName()))) {
+    //             srcDirContents.add(item);
+    //         }
+    //         continue;
+    //     }
+
+    //     srcDirContents.sort(Comparator.comparing(File::getName, String.CASE_INSENSITIVE_ORDER));
+    //     listViewSrcDir.setItems(srcDirContents);
+    // }
 
     @FXML public void handleCheckAll() {
         checkedFiles.addAll(srcDirContents);
         listViewSrcDir.refresh();
+        onCheckedFilesChanged();
     }
 
     @FXML public void handleUncheckAll() {
         checkedFiles.clear();
         listViewSrcDir.refresh();
+        onCheckedFilesChanged();
     }
 
     @FXML public void selectedFile(MouseEvent event) {
