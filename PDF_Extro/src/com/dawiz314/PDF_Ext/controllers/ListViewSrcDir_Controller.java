@@ -1,6 +1,6 @@
 package PDF_Ext.controllers;
 
-import PDF_Ext.classes.FileCheckBoxCell;
+import PDF_Ext.classes.FileCheckBoxCellSimple;
 
 import java.io.File;
 import java.util.Comparator;
@@ -61,7 +61,7 @@ public class ListViewSrcDir_Controller {
         });
 
         // Use the simple (non-observable) cell and notify on changes
-        listViewSrcDir.setCellFactory(lv -> new PDF_Ext.classes.FileCheckBoxCellSimple(checkedFiles, this::onCheckedFilesChanged));
+        listViewSrcDir.setCellFactory(lv -> new FileCheckBoxCellSimple(checkedFiles, this::onCheckedFilesChanged));
 
         selectionCountLabel.setText("Select a directory to get started!");
     }
