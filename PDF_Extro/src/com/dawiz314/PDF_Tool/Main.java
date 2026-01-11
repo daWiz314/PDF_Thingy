@@ -63,12 +63,8 @@ public class Main {
                 int pageCount = 0;
                 int totalOverallPages = 0;
 
-                javafx.application.Platform.runLater(() -> {
-                    statusLabel.setText("Starting pre-scan...");
-                });
-
                 for (ListFile file : selectedFiles) {
-                    statusLabel.setText("Starting pre-scan...");
+                    // statusLabel.setText("Starting pre-scan..."); // Need to move this to the JavaFX thread
                     // This lambda tells PDFBox to create a temporary file cache for this document
                     try (PDDocument doc = Loader.loadPDF(file.getFile(), IOUtils.createTempFileOnlyStreamCache())) {
                         totalOverallPages += doc.getNumberOfPages();
