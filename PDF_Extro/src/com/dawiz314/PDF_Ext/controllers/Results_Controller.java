@@ -21,7 +21,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.util.Callback;
 
 public class Results_Controller {
-    // Actual UI Components -------------------------------------------------------------------
+    // Actual UI Components --------------------------------------------------------------------
     @FXML private Label resultCountLabel;                                           // "Selected 0 / 0 Matches"
     @FXML private Button buttonExportSelected;                                      // Export Button
     @FXML private Button buttonDeleteSelected;                                      // Delete Button
@@ -33,9 +33,9 @@ public class Results_Controller {
     private final Set<ListFile> checkedFiles = new HashSet<>();                     // Plain set to track checked files
     public Consumer<ListFile> PreviewWindowCallBack;                                // Callback to open preview window  
 
-    // Methods -------------------------------------------------------------------------------
+    // Methods ---------------------------------------------------------------------------------
     public void initialize() {
-        // Set up ListView to show results ---------------------------------------------------
+        // Set up ListView to show results -----------------------------------------------------
         listViewResults.setItems(results); // Set the items to the results list, which should be nothing atm
 
         // Set up cell factory to use checkboxes
