@@ -51,13 +51,14 @@ public class Results_Controller {
                 PreviewWindowCallBack.accept(newFile);
             }
         });
-
+        // Commented out for now, as it double fires with the selectedItemProperty event
+        
         // Send file to preview on double-click
-        listViewResults.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                safeNotifyPreview(newVal);
-            }
-        });
+        // listViewResults.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+        //     if (newVal != null) {
+        //         safeNotifyPreview(newVal);
+        //     }
+        // });
 
         listViewResults.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
