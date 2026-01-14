@@ -61,10 +61,12 @@ public class ListFile{
         if (this == o) return true;
         if (!(o instanceof ListFile)) return false;
         ListFile other = (ListFile) o;
-        return Objects.equals(file == null ? null : file.getAbsolutePath(), other.file == null ? null : other.file.getAbsolutePath());
+        String thisPath = file == null ? null : file.getAbsolutePath();
+        String otherPath = other.file == null ? null : other.file.getAbsolutePath();
+        return Objects.equals(thisPath, otherPath) && this.pageNumber == other.pageNumber;
     }
 
     @Override public int hashCode() {
-        return Objects.hash(file == null ? null : file.getAbsolutePath());
+        return Objects.hash(file == null ? null : file.getAbsolutePath(), pageNumber);
     }
 }
