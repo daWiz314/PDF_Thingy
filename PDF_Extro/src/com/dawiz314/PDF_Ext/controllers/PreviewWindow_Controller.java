@@ -27,6 +27,7 @@ public class PreviewWindow_Controller {
     private int currentPage = 0;
     private int totalPages = 0;
     private String searchTerm = ""; // Store the term to highlight
+    private javafx.concurrent.Task<WritableImage> currentRenderTask;
 
     @FXML private Label TitleText;
     @FXML private Label pageLabel;
@@ -52,17 +53,17 @@ public class PreviewWindow_Controller {
         });
 
         // TODO: Fix this, by disabling focus on buttons on page
-        javafx.application.Platform.runLater(() -> {
-            if (pdfImageView.getScene() != null) {
-                pdfImageView.getScene().setOnKeyPressed(event -> {
-                    switch (event.getCode()) {
-                        case RIGHT: case DOWN: handleNextPage(); break;
-                        case LEFT: case UP: handlePreviousPage(); break;
-                        default: break;
-                    }
-                });
-            }
-        });
+        // javafx.application.Platform.runLater(() -> {
+        //     if (pdfImageView.getScene() != null) {
+        //         pdfImageView.getScene().setOnKeyPressed(event -> {
+        //             switch (event.getCode()) {
+        //                 case RIGHT: case DOWN: handleNextPage(); break;
+        //                 case LEFT: case UP: handlePreviousPage(); break;
+        //                 default: break;
+        //             }
+        //         });
+        //     }
+        // });
     }
 
     // New method to set the search term from the Index_Controller
@@ -78,7 +79,7 @@ public class PreviewWindow_Controller {
     public void setPdfFile(File file, int page) {
         this.currentFile = file;
         this.currentPage = page; 
-        
+        this.clearAssets();
         TitleText.setText("Viewing: " + file.getName());
         scrollableArea.setVisible(true);
         pdfImageView.setVisible(false);
@@ -97,6 +98,11 @@ public class PreviewWindow_Controller {
 
     private void renderPage(int pageIndex) {
         if (currentFile == null) return;
+
+        // Cancel any previous render task so an older render cannot overwrite a newer one
+        if (currentRenderTask != null && !currentRenderTask.isDone()) {
+            currentRenderTask.cancel();
+        }
 
         javafx.concurrent.Task<WritableImage> renderTask = new javafx.concurrent.Task<>() {
             @Override
@@ -139,12 +145,19 @@ public class PreviewWindow_Controller {
         };
 
         renderTask.setOnSucceeded(e -> {
+            // If this task was cancelled in the meantime, ignore its result
+            if (renderTask.isCancelled()) return;
             pdfImageView.setImage(renderTask.getValue());
             loadingLabel.setVisible(false);
             pdfImageView.setVisible(true);
             pageLabel.setText(String.format("Page: %d / %d", pageIndex + 1, totalPages));
         });
 
+        renderTask.setOnCancelled(e -> {
+            // No UI update needed when cancelled
+        });
+
+        currentRenderTask = renderTask;
         new Thread(renderTask).start();
     }
 
