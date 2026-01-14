@@ -122,6 +122,7 @@ public class Index_Controller {
                 activePreviewController.setHighlightTerm(searchTerm.getText());
                 activePreviewController.setPdfFile(_lambda_LFile.getFile(), _lambda_LFile.getPageNumber());
             };
+            return; // Preview window already open
         }
 
         java.net.URL fxmlLocation = getClass().getResource("/PDF_Ext/views/PreviewWindow.fxml");
