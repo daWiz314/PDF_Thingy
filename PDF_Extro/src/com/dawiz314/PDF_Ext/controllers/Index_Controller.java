@@ -153,6 +153,15 @@ public class Index_Controller {
                 RESULTSController.PreviewWindowCallBack = (lf) -> { openPreviewWindow(lf); };
             });
             stage.show();
+            // Show the file if we have one
+            if (LFile != null && activePreviewController != null) {
+                activePreviewController.setHighlightTerm(searchTerm.getText());
+                if (LFile.getPageNumber() >= 0) {
+                    activePreviewController.setPdfFile(LFile.getFile(), LFile.getPageNumber());
+                } else {
+                    activePreviewController.setPdfFile(LFile.getFile());
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
