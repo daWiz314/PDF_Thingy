@@ -15,11 +15,14 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
+import javafx.collections.ListChangeListener;
 
 
 public class ListViewSrcDir_Controller {
@@ -31,19 +34,34 @@ public class ListViewSrcDir_Controller {
     // Variables -------------------------------------------------------------------------------
     private ObservableList<ListFile> srcDirContents = FXCollections.observableArrayList();  // Contains the items that actually go in the ListView
     private final Set<ListFile> checkedFiles = new HashSet<>();                             // Plain set to track checked files
-    public Consumer<File> PreviewWindowCallBack;                                            // Callback to open preview window
+    public Consumer<ListFile> PreviewWindowCallBack;                                            // Callback to open preview window
 
     public void initialize() {
 
         listViewSrcDir.setItems(srcDirContents);
-        listViewSrcDir.setCellFactory(CheckBoxListCell.forListView(new Callback<ListFile, ObservableValue<Boolean>>() {
-            @Override public ObservableValue<Boolean> call(ListFile item) {
-                return item == null ? null : item.selectedProperty();
+        listViewSrcDir.setCellFactory(new Callback<ListView<ListFile>, ListCell<ListFile>>() {
+            @Override
+            public ListCell<ListFile> call(ListView<ListFile> lv) {
+                return new CheckBoxListCell<ListFile>(item -> item == null ? null : item.selectedProperty()) {
+                    @Override
+                    public void updateItem(ListFile item, boolean empty) {
+                        super.updateItem(item, empty);
+                        // Ensure the checkbox does not take focus when clicked to avoid focus jumping
+                        if (getGraphic() instanceof CheckBox) {
+                            CheckBox cb = (CheckBox) getGraphic();
+                            cb.setFocusTraversable(false);
+                        }
+                    }
+                };
             }
-        }));
-        listViewSrcDir.getSelectionModel().selectedItemProperty().addListener((obs, oldFile, newFile) -> {
-            if (newFile != null && PreviewWindowCallBack != null) {
-                PreviewWindowCallBack.accept(newFile.getFile());
+        });
+
+        listViewSrcDir.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+                ListFile selected = listViewSrcDir.getSelectionModel().getSelectedItem();
+                if (selected != null) {
+                    PreviewWindowCallBack.accept(selected);
+                }
             }
         });
 
@@ -65,6 +83,23 @@ public class ListViewSrcDir_Controller {
     });
 
         selectionCountLabel.setText("Select a directory to get started!");
+
+        // Ensure we react to checkbox changes immediately by attaching listeners
+        // to each ListFile.selectedProperty, and attach to future additions.
+        for (ListFile lf : srcDirContents) {
+            lf.selectedProperty().addListener((obs, oldV, newV) -> onCheckedFilesChanged());
+        }
+
+        srcDirContents.addListener((ListChangeListener<ListFile>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (ListFile lf : change.getAddedSubList()) {
+                        lf.selectedProperty().addListener((obs, oldV, newV) -> onCheckedFilesChanged());
+                    }
+                }
+            }
+            onCheckedFilesChanged();
+        });
     }
 
     // Called by cells when their check state changes
@@ -74,6 +109,7 @@ public class ListViewSrcDir_Controller {
         selectionCountLabel.setText(String.format("Selected: %d / %d files", count, total));
         if (searchSubmit != null) searchSubmit.setDisable(count == 0);
         PDF_Tool.Main.updateSelectedFile(srcDirContents.stream().filter(ListFile::isSelected));
+        listViewSrcDir.refresh();
     }
 
     public static String getFileExtension(String filename) {
@@ -109,24 +145,36 @@ public class ListViewSrcDir_Controller {
         srcDirContents.sort(Comparator.comparing(file -> file.getFile().getName(), String.CASE_INSENSITIVE_ORDER));
 
         listViewSrcDir.setItems(srcDirContents);
-        listViewSrcDir.refresh();
+        
         onCheckedFilesChanged();
     }
 
     @FXML public void handleCheckAll() {
         srcDirContents.forEach(file -> file.setSelected(true));
-        listViewSrcDir.refresh();
+        
         onCheckedFilesChanged();
     }
 
     @FXML public void handleUncheckAll() {
         srcDirContents.forEach(file -> file.setSelected(false));
-        listViewSrcDir.refresh();
+        
         onCheckedFilesChanged();
     }
 
     @FXML public void selectedFile(MouseEvent event) {
         System.out.println("Clicked! Setting PDF to: " + listViewSrcDir.getSelectionModel().getSelectedItem());
-        PreviewWindowCallBack.accept(listViewSrcDir.getSelectionModel().getSelectedItem().getFile());
+        // Ignore clicks that originate on the checkbox itself to avoid selection/focus mismatches
+        javafx.scene.Node target = (javafx.scene.Node) event.getTarget();
+        while (target != null && target != listViewSrcDir) {
+            if (target instanceof javafx.scene.control.CheckBox) {
+                return;
+            }
+            target = target.getParent();
+        }
+
+        System.out.println("Clicked! Setting PDF to: " + listViewSrcDir.getSelectionModel().getSelectedItem());
+        if (PreviewWindowCallBack != null && listViewSrcDir.getSelectionModel().getSelectedItem() != null) {
+            PreviewWindowCallBack.accept(listViewSrcDir.getSelectionModel().getSelectedItem());
+        }
     }
 }

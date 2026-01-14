@@ -9,12 +9,15 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.stage.DirectoryChooser;
@@ -39,35 +42,58 @@ public class Results_Controller {
         listViewResults.setItems(results); // Set the items to the results list, which should be nothing atm
 
         // Set up cell factory to use checkboxes
-        listViewResults.setCellFactory(CheckBoxListCell.forListView(new Callback<ListFile, ObservableValue<Boolean>>() {
-            @Override public ObservableValue<Boolean> call(ListFile item) {
-                return item == null ? null : item.selectedProperty();
-            }
-        }));
-
-        // Set up checked items tracking
-        listViewResults.getSelectionModel().selectedItemProperty().addListener((obs, oldFile, newFile) -> {
-            if (newFile != null && PreviewWindowCallBack != null) {
-                PreviewWindowCallBack.accept(newFile);
+        listViewResults.setCellFactory(new Callback<ListView<ListFile>, ListCell<ListFile>>() {
+            @Override
+            public ListCell<ListFile> call(ListView<ListFile> lv) {
+                return new CheckBoxListCell<ListFile>(item -> item == null ? null : item.selectedProperty()) {
+                    @Override
+                    public void updateItem(ListFile item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (getGraphic() instanceof CheckBox) {
+                            CheckBox cb = (CheckBox) getGraphic();
+                            cb.setFocusTraversable(false);
+                        }
+                    }
+                };
             }
         });
-        // Commented out for now, as it double fires with the selectedItemProperty event
 
-        // Send file to preview on double-click
-        // listViewResults.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-        //     if (newVal != null) {
-        //         safeNotifyPreview(newVal);
+        // Set up checked items tracking
+        // listViewResults.getSelectionModel().selectedItemProperty().addListener((obs, oldFile, newFile) -> {
+        //     if (newFile != null && PreviewWindowCallBack != null) {
+        //         PreviewWindowCallBack.accept(newFile);
         //     }
         // });
 
-        listViewResults.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
-                ListFile selected = listViewResults.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    safeNotifyPreview(selected);
+        // Attach listeners so checkbox changes update counts immediately
+        for (ListFile lf : results) {
+            lf.selectedProperty().addListener((obs, oldV, newV) -> onCheckedFilesChanged());
+        }
+        results.addListener((ListChangeListener<ListFile>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (ListFile lf : change.getAddedSubList()) {
+                        lf.selectedProperty().addListener((obs, oldV, newV) -> onCheckedFilesChanged());
+                    }
                 }
             }
+            onCheckedFilesChanged();
         });
+
+        // Handle mouse clicks: ignore checkbox-originating clicks, support single & double click preview
+        listViewResults.setOnMouseClicked(event -> {
+            javafx.scene.Node target = (javafx.scene.Node) event.getTarget();
+            while (target != null && target != listViewResults) {
+                if (target instanceof CheckBox) return;
+                target = target.getParent();
+            }
+
+            if (event.getClickCount() == 2 && event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+                ListFile selected = listViewResults.getSelectionModel().getSelectedItem();
+                if (selected == null) return;
+                safeNotifyPreview(selected);
+            }
+        }); 
     }
 
 private void onCheckedFilesChanged() {
