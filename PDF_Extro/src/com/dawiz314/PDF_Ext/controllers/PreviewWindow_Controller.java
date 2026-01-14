@@ -190,4 +190,13 @@ public class PreviewWindow_Controller {
             e.printStackTrace();
         }
     }
+    @FXML public void clearAssets() {
+        // Cancel any in-progress render
+        if (currentRenderTask != null && !currentRenderTask.isDone()) {
+            currentRenderTask.cancel();
+        }
+        pdfImageView.setImage(null);
+        scrollableArea.setVisible(false);
+        TitleText.setText("Please select a file!");
+    }
 }
