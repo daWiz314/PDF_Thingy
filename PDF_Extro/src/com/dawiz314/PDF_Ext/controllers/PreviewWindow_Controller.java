@@ -34,6 +34,7 @@ public class PreviewWindow_Controller {
     @FXML private Slider zoomSlider;
     @FXML private ScrollPane scrollableArea;
     @FXML private ImageView pdfImageView;
+    @FXML private Label loadingLabel;
 
     public void initialize() {
         TitleText.setText("Please select a file!");
@@ -80,7 +81,9 @@ public class PreviewWindow_Controller {
         
         TitleText.setText("Viewing: " + file.getName());
         scrollableArea.setVisible(true);
-        pdfImageView.setVisible(true);
+        pdfImageView.setVisible(false);
+        loadingLabel.setVisible(true);
+        loadingLabel.setText("Loading: " + file.getName());
 
         try (PDDocument document = Loader.loadPDF(file)) {
             this.totalPages = document.getNumberOfPages();
@@ -137,6 +140,8 @@ public class PreviewWindow_Controller {
 
         renderTask.setOnSucceeded(e -> {
             pdfImageView.setImage(renderTask.getValue());
+            loadingLabel.setVisible(false);
+            pdfImageView.setVisible(true);
             pageLabel.setText(String.format("Page: %d / %d", pageIndex + 1, totalPages));
         });
 
