@@ -52,7 +52,7 @@ public class Results_Controller {
             }
         });
         // Commented out for now, as it double fires with the selectedItemProperty event
-        
+
         // Send file to preview on double-click
         // listViewResults.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
         //     if (newVal != null) {
