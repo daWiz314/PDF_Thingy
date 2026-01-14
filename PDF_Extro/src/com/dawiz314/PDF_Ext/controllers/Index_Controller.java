@@ -123,6 +123,8 @@ public class Index_Controller {
                 activePreviewController.setPdfFile(_lambda_LFile.getFile(), _lambda_LFile.getPageNumber());
             };
             return; // Preview window already open
+        } else {
+            System.out.println("No active preview window, creating a new one.");
         }
 
         java.net.URL fxmlLocation = getClass().getResource("/PDF_Ext/views/PreviewWindow.fxml");
@@ -141,21 +143,34 @@ public class Index_Controller {
             stage.setTitle("PDF Preview");
             stage.setScene(new Scene(root));
             stage.setAlwaysOnTop(true);
-            // stage.setOnHidden(e -> {
-            //     activePreviewController = null;
-            //     System.out.println("Preview window closed, reference cleared.");
-            // });
+            stage.setOnHidden(e -> {
+                activePreviewController.clearAssets();
+                activePreviewController = null;
+                System.out.println("Preview window closed, reference cleared.");
+
+                // Restore safe callbacks so double-clicks or selections will re-open the preview
+                LIST_VIEWController.PreviewWindowCallBack = (file) -> { openPreviewWindow(new PDF_Ext.classes.ListFile(file)); };
+                RESULTSController.PreviewWindowCallBack = (lf) -> { openPreviewWindow(lf); };
+            });
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        LIST_VIEWController.PreviewWindowCallBack = (file) -> {activePreviewController.setPdfFile(file);};
-        RESULTSController.PreviewWindowCallBack = (_lambda_LFile) -> {
-            if (activePreviewController != null) {
-                openPreviewWindow(_lambda_LFile);
+        LIST_VIEWController.PreviewWindowCallBack = (file) -> {
+            if (activePreviewController == null) {
+                openPreviewWindow(new PDF_Ext.classes.ListFile(file));
+            } else {
+                activePreviewController.setPdfFile(file);
             }
-            activePreviewController.setHighlightTerm(searchTerm.getText());
-            activePreviewController.setPdfFile(_lambda_LFile.getFile(), _lambda_LFile.getPageNumber());
+        };
+
+        RESULTSController.PreviewWindowCallBack = (_lambda_LFile) -> {
+            if (activePreviewController == null) {
+                openPreviewWindow(_lambda_LFile);
+            } else {
+                activePreviewController.setHighlightTerm(searchTerm.getText());
+                activePreviewController.setPdfFile(_lambda_LFile.getFile(), _lambda_LFile.getPageNumber());
+            }
         };
     }
 }
