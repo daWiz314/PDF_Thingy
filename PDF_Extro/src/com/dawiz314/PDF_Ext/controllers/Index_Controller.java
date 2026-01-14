@@ -69,6 +69,9 @@ public class Index_Controller {
         PDF_Tool.Main.call_back_function_for_matches = (ListFile file) -> { RESULTSController.updateResults(file);};
 
         // Set up call back function to open preview window
+        LIST_VIEWController.PreviewWindowCallBack = (ListFile _lambda_file) -> {
+            openPreviewWindow(_lambda_file);
+            };
         RESULTSController.PreviewWindowCallBack = (ListFile file) -> {
             openPreviewWindow(file);
         };
@@ -116,7 +119,7 @@ public class Index_Controller {
         }
         if (activePreviewController != null) {
             LIST_VIEWController.PreviewWindowCallBack = (_lambda_file) -> {
-                activePreviewController.setPdfFile(_lambda_file);
+                activePreviewController.setPdfFile(_lambda_file.getFile());
             };
             RESULTSController.PreviewWindowCallBack = (_lambda_LFile) -> {
                 activePreviewController.setHighlightTerm(searchTerm.getText());
@@ -149,7 +152,7 @@ public class Index_Controller {
                 System.out.println("Preview window closed, reference cleared.");
 
                 // Restore safe callbacks so double-clicks or selections will re-open the preview
-                LIST_VIEWController.PreviewWindowCallBack = (file) -> { openPreviewWindow(new PDF_Ext.classes.ListFile(file)); };
+                LIST_VIEWController.PreviewWindowCallBack = (file) -> { openPreviewWindow(file); };
                 RESULTSController.PreviewWindowCallBack = (lf) -> { openPreviewWindow(lf); };
             });
             stage.show();
@@ -167,9 +170,9 @@ public class Index_Controller {
         }
         LIST_VIEWController.PreviewWindowCallBack = (file) -> {
             if (activePreviewController == null) {
-                openPreviewWindow(new PDF_Ext.classes.ListFile(file));
+                openPreviewWindow(file);
             } else {
-                activePreviewController.setPdfFile(file);
+                activePreviewController.setPdfFile(file.getFile());
             }
         };
 
