@@ -28,6 +28,7 @@
     <ScrollPane fx:id="scrollableArea" fitToWidth="true" VBox.vgrow="ALWAYS">
         <VBox alignment="CENTER" style="-fx-background-color: grey;">
             <ImageView fx:id="pdfImageView" preserveRatio="true" />
+            <Label fx:id="loadingLabel" text="Loading!" />
         </VBox>
     </ScrollPane>
 </VBox>
