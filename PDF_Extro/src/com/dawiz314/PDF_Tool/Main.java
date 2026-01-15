@@ -1,13 +1,14 @@
 package PDF_Tool;
 
-import PDF_Ext.classes.SearchResult;
+import PDF_Ext.classes.ListFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Random;
-import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,7 +18,6 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.io.IOUtils;
 
 public class Main {
@@ -28,18 +28,18 @@ public class Main {
     static public Label overallStatusLabel;     // Bottom status label - Gives overall search status                 - BOUND TO TASK
     static public Button searchStop;
 
-    static Set<File> selectedFiles;
+    static ObservableList<ListFile> selectedFiles;
     static String searchQuery;
 
     static public Task<Void> activeSearchTask;
-    static public Consumer<SearchResult> call_back_function_for_matches;
+    static public Consumer<ListFile> call_back_function_for_matches;
 
     public void main() {
         System.out.println("Hello World");
     }
 
-    public static void updateSelectedFile(Set<File> files) {
-        selectedFiles = files;
+    public static void updateSelectedFile(Stream<ListFile> files) {
+        selectedFiles = FXCollections.observableArrayList(files.collect(Collectors.toList()));
         System.out.println("Updated files to: " + selectedFiles);
     }
 
@@ -63,17 +63,13 @@ public class Main {
                 int pageCount = 0;
                 int totalOverallPages = 0;
 
-                javafx.application.Platform.runLater(() -> {
-                    statusLabel.setText("Starting pre-scan...");
-                });
-
-                for (File file : selectedFiles) {
-                    statusLabel.setText("Starting pre-scan...");
+                for (ListFile file : selectedFiles) {
+                    // statusLabel.setText("Starting pre-scan..."); // Need to move this to the JavaFX thread
                     // This lambda tells PDFBox to create a temporary file cache for this document
-                    try (PDDocument doc = Loader.loadPDF(file, IOUtils.createTempFileOnlyStreamCache())) {
+                    try (PDDocument doc = Loader.loadPDF(file.getFile(), IOUtils.createTempFileOnlyStreamCache())) {
                         totalOverallPages += doc.getNumberOfPages();
                         updateProgress(fileCount, totalFiles);
-                        updateMessage("Pre-scanning file " + (fileCount + 1) + " of " + totalFiles + ": " + file.getName() + "\nPages scanned: " + totalOverallPages);
+                        updateMessage("Pre-scanning file " + (fileCount + 1) + " of " + totalFiles + ": " + file.getFile().getName() + "\nPages scanned: " + totalOverallPages);
                         doc.close();
                         fileCount++;
                     } catch (IOException e) {
@@ -81,23 +77,23 @@ public class Main {
                     }
                 }
                 fileCount = 0;
-                for (File file : selectedFiles) {
+                for (ListFile file : selectedFiles) {
                     if (isCancelled()) break;
 
                     fileCount++;
-                    System.err.println("Scanning file " + fileCount + " of " + totalFiles + ": " + file.getName());
+                    System.err.println("Scanning file " + fileCount + " of " + totalFiles + ": " + file.getFile().getName());
 
                     updateProgress(fileCount, totalFiles);
-                    updateMessage("Scanning file " + fileCount + " of " + totalFiles + ": " + file.getName() + "\nPages scanned: " + pageCount + " / " + totalOverallPages);
+                    updateMessage("Scanning file " + fileCount + " of " + totalFiles + ": " + file.getFile().getName() + "\nPages scanned: " + pageCount + " / " + totalOverallPages);
 
-                    try (PDDocument doc = Loader.loadPDF(file, IOUtils.createMemoryOnlyStreamCache())) {
+                    try (PDDocument doc = Loader.loadPDF(file.getFile(), IOUtils.createMemoryOnlyStreamCache())) {
                         PDFTextStripper stripper = new PDFTextStripper();
                         stripper.setSortByPosition(false);
                         int totalPages = doc.getNumberOfPages();
 
                         for (int i = 1; i <= totalPages; i++) {
                             try {
-                                updateMessage("Scanning file " + fileCount + " of " + totalFiles + ": " + file.getName() + "\nPages scanned: " + pageCount + " / " + totalOverallPages);
+                                updateMessage("Scanning file " + fileCount + " of " + totalFiles + ": " + file.getFile().getName() + "\nPages scanned: " + pageCount + " / " + totalOverallPages);
                                 if (isCancelled()) break;
                                 pageCount++;
                                 stripper.setStartPage(i);
@@ -113,7 +109,7 @@ public class Main {
                                     }
 
                                     javafx.application.Platform.runLater(() -> {
-                                        call_back_function_for_matches.accept(new SearchResult(file, page));
+                                        call_back_function_for_matches.accept(new ListFile(file.getFile(), page, true));
                                         // System.out.println("Found match on page " + page);
 
                                     });
@@ -126,22 +122,22 @@ public class Main {
                                     myProgressBar.setProgress(filePercent);
                                 });
                             } catch (java.io.EOFException e) {
-                                System.err.println("\n\nReached unexpected end of file while reading page " + i + " of file: " + file.getAbsolutePath());
+                                System.err.println("\n\nReached unexpected end of file while reading page " + i + " of file: " + file.getFile().getAbsolutePath());
                                 // e.printStackTrace();
                             } catch (Exception e) {
-                                System.err.println("\n\nError processing page " + i + " of file: " + file.getAbsolutePath());
+                                System.err.println("\n\nError processing page " + i + " of file: " + file.getFile().getAbsolutePath());
                                 // e.printStackTrace();
                             }
                         }
-                        updateMessage("Scanning file " + fileCount + " of " + totalFiles + ": " + file.getName() + "\nPages scanned: " + pageCount + " / " + totalOverallPages);
+                        updateMessage("Scanning file " + fileCount + " of " + totalFiles + ": " + file.getFile().getName() + "\nPages scanned: " + pageCount + " / " + totalOverallPages);
                         doc.close();
                     } catch (java.io.EOFException e) {
                         System.err.println("\n\n");
-                        System.err.println("\n\nError: Reached unexpected end of file while reading: " + file.getAbsolutePath());
+                        System.err.println("\n\nError: Reached unexpected end of file while reading: " + file.getFile().getAbsolutePath());
                         // e.printStackTrace();
                     } catch (IOException e) {
                         // This way we can try and figure out what broke
-                        System.err.println("\n\nError reading file: " + file.getAbsolutePath());
+                        System.err.println("\n\nError reading file: " + file.getFile().getAbsolutePath());
                         // e.printStackTrace();
                     }
                 }
