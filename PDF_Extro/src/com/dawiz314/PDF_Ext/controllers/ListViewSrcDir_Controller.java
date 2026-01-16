@@ -34,7 +34,7 @@ public class ListViewSrcDir_Controller {
     // Variables -------------------------------------------------------------------------------
     private ObservableList<ListFile> srcDirContents = FXCollections.observableArrayList();  // Contains the items that actually go in the ListView
     private final Set<ListFile> checkedFiles = new HashSet<>();                             // Plain set to track checked files
-    public Consumer<ListFile> PreviewWindowCallBack;                                            // Callback to open preview window
+    public Consumer<ListFile> PreviewWindowCallBack;                                        // Callback to open preview window
 
     public void initialize() {
 
