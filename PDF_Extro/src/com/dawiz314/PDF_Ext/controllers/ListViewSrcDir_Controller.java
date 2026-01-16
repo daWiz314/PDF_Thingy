@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.function.Consumer;
 import java.util.Set;
 
-import javafx.beans.value.ObservableValue;
+
 import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
